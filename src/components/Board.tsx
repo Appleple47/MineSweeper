@@ -1,59 +1,64 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import type { Board } from "../types/types";
 import { generateBoard } from "../utils/board";
-import { Cell } from "./Cell";
+import {Cell} from "./Cell";
 
 export const size = 15;
 export const numberOfMine = Math.floor(size * size / 10);
 export let chainedblock = 0;
+export let firstblock = false;
+interface Props {
+    board: Board;
+    setBoard: React.Dispatch<React.SetStateAction<Board>>;
+}
 
-export const BoardComponent: React.FC = () => {
-    const [board, setBoard] = useState<Board>(() => generateBoard(size, size, numberOfMine));
+const screenSize = Math.min(window.innerWidth, window.innerHeight);
+const cellSize = Math.floor(screenSize / size) * 0.65;
 
-    useEffect(() => {
-        setBoard(generateBoard(size, size, numberOfMine));
-    }, []); 
-
-    const screenSize = Math.min(window.innerWidth, window.innerHeight) * 0.6;
-    const cellSize = Math.floor(screenSize / size);
-
+export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {
     const handleClick = (r: number, c: number) => {
-        const newBoard = board.map((row) => row.map((cell) => ({ ...cell })));
-        newBoard[r][c].isOpen = true;
+        if (!firstblock) {
+            let newBoard: Board;
+            while (true) {
+                newBoard = generateBoard(size, size, numberOfMine);
+                if (!newBoard[r][c].isMine){
+                    break;
+                }
+            }
+            newBoard[r][c].isOpen = true;
+            firstblock = true;
+            if (newBoard[r][c].neighborMines === 0) {
+                chainOpen(newBoard, newBoard[r][c]);
+            }
+            setBoard(newBoard);
+        }else{
+            const newBoard = board.map((row) => row.map((cell) => ({ ...cell })));
+            newBoard[r][c].isOpen = true;
         
-        if (newBoard[r][c].neighborMines === 0 && !newBoard[r][c].isMine) {
-            chainOpen(newBoard, newBoard[r][c]);
+            if (newBoard[r][c].neighborMines === 0 && !newBoard[r][c].isMine) {
+                chainOpen(newBoard, newBoard[r][c]);
+            }
+        
+            setBoard(newBoard);
         }
-        
-        setBoard(newBoard);
     };
     return (
-        <div style={{ 
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: "flex", 
-            justifyContent: "center", 
-            alignItems: "center",
+        <div style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${size}, ${cellSize+6}px)`,
+            gap: 0,
+            paddingBottom: "50px",
         }}>
-            <div style={{
-                display: "grid",
-                gridTemplateColumns: `repeat(${size}, ${cellSize+6}px)`,
-                gap: 0,
-            }}>
-                {board.map((row, r) =>
-                    row.map((cell, c) => (
-                        <Cell 
-                            key={`${r}-${c}`}
-                            cell={cell} 
-                            cellSize={cellSize}
-                            onClick={() => handleClick(r, c)} 
-                        />
-                    ))
-                )}
-            </div>
+            {board.map((row, r) =>
+                row.map((cell, c) => (
+                    <Cell 
+                        key={`${r}-${c}`}
+                        cell={cell} 
+                        cellSize={cellSize}
+                        onClick={() => handleClick(r, c)} 
+                    />
+                ))
+            )}
         </div>
     );
 };
