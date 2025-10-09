@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import type {Board, Cell as CellType} from "../types/types";
 import { size, numberOfMine, chainedblock } from "./Board";
 
@@ -25,6 +25,11 @@ const getCellText = (cell: Cell): string => {
 export const Cell: React.FC<Props> = ({ cell, cellSize, onClick }) => {
     const handleClick = () => {
         onClick();
+        if(openedblock === 0 && cell.isMine){
+            useEffect(() => {
+                setBoard(generateBoard(size, size, numberOfMine));
+            }, []); 
+        }
         if(cell.isMine){
             cell.isOpen=true;
             alert("💣 Game Over!");
@@ -53,3 +58,12 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick }) => {
         </button>
     );
 };
+
+function setBoard(arg0: any) {
+    throw new Error("Function not implemented.");
+}
+
+
+function generateBoard(size: number, size1: number, numberOfMine: number): any {
+    throw new Error("Function not implemented.");
+}
