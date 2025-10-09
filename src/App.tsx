@@ -11,7 +11,7 @@ function App() {
       paddingTop: "2rem",
       gap: "1rem"
     }}>
-      <h1>Mine Sweeper ⛏️</h1>
+      {/* <h1>Mine Sweeper ⛏️</h1> */}
       <BoardComponent />
     </div>
   );
