@@ -4,11 +4,11 @@ import { BoardComponent } from './components/Board';
 import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
 import { numberOfMine, size } from './components/Board';
+import { gameovered } from "./components/Cell";
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [board, setBoard] = useState<Board>(() => generateBoard(size, size, numberOfMine));
-
   if (!gameStarted) {
     return (
       <div style={{
@@ -48,7 +48,38 @@ function App() {
       </div>
     );
   }
-
+  if(gameovered){
+    return (
+      <div style={{
+        flexDirection: "column",
+        alignItems: "center",
+        minHeight: "100vh",
+        gap: "1rem",
+        color: "black",
+      }}>
+        <h1>Mine Sweeper ⛏️</h1>
+        <BoardComponent board={board} setBoard={setBoard} />
+        <button
+          onClick={() => location.reload() }
+          style={{
+            fontSize: "1.5rem",
+            padding: "1rem 2rem",
+            cursor: "pointer",
+            background: "#667eea",
+            color: "white",
+            border: "none",
+            borderRadius: "10px",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            transition: "transform 0.2s",
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+          onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+        >
+          RETURN
+        </button>
+      </div>
+    );
+  }
   return (
     <div style={{
       flexDirection: "column",

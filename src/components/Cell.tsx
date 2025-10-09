@@ -1,6 +1,5 @@
 import type {Board, Cell as CellType} from "../types/types";
 import { size, numberOfMine, chainedblock} from "./Board";
-
 export let openedblock = 0;
 export let gameovered = false;
 type Props = {
@@ -22,16 +21,19 @@ const getCellText = (cell: Cell): string => {
 
 export const Cell: React.FC<Props> = ({ cell, cellSize, onClick }) => {
     const handleClick = () => {
-        onClick();
-        if(cell.isMine && openedblock > 0){
-            cell.isOpen=true;
-            alert("💣 Game Over!");
-        }
-        if(!cell.isOpen){
-            openedblock++;
-            cell.isOpen = true;
-            if(chainedblock + openedblock + numberOfMine === size * size){
-                alert("🎊 Game Clear!");
+        if(!gameovered){
+            onClick();
+            if(cell.isMine && openedblock > 0){
+                cell.isOpen=true;
+                alert("💣 Game Over!");
+                gameovered = true;
+            }
+            if(!cell.isOpen){
+                openedblock++;
+                cell.isOpen = true;
+                if(chainedblock + openedblock + numberOfMine === size * size){
+                    alert("🎊 Game Clear!");
+                }
             }
         }
     };

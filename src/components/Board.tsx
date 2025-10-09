@@ -2,7 +2,6 @@ import React from "react";
 import type { Board } from "../types/types";
 import { generateBoard } from "../utils/board";
 import {Cell} from "./Cell";
-
 export const size = 15;
 export const numberOfMine = Math.floor(size * size / 10);
 export let chainedblock = 0;
