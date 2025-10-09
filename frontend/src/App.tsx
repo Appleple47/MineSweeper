@@ -5,12 +5,21 @@ import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
 import { numberOfMine, size } from './components/Board';
 import { gameovered } from "./components/Cell";
-// import {asyncTable} from "../../backend/src/server"
+export let UserName = ' ';
 
 function App() {
-  // asyncTable();
   const [gameStarted, setGameStarted] = useState(false);
   const [board, setBoard] = useState<Board>(() => generateBoard(size, size, numberOfMine));
+  const [username, setUsername] = useState('');
+  const startGame = () => {
+    if (username.trim() !== '') {
+      UserName = username;
+      setGameStarted(true);
+    } else {
+      alert('ユーザー名を入力してください。');
+    }
+  };
+
   if (!gameStarted) {
     return (
       <div style={{
@@ -28,8 +37,30 @@ function App() {
         }}>
           💣Mine Sweeper
         </h1>
+
+        <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1rem",
+          }}>
+          <input
+            type="text"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{
+              fontSize: "1.2rem",
+              padding: "0.8rem 1rem",
+              borderRadius: "8px",
+              border: "2px solid #667eea",
+              width: "300px",
+              textAlign: "left",
+            }}
+          />
+        </div>
         <button
-          onClick={() => setGameStarted(true)}
+          onClick={startGame}
           style={{
             fontSize: "1.5rem",
             padding: "1rem 3rem",
@@ -91,7 +122,7 @@ function App() {
       color: "black",
     }}>
       <h1>Mine Sweeper ⛏️</h1>
-
+      <h1>{username}</h1>
       <BoardComponent board={board} setBoard={setBoard} />
 
       <button

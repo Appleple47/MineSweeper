@@ -1,3 +1,4 @@
+import { UserName } from "../App";
 import type { Cell as CellType} from "../types/types";
 import { size, numberOfMine, chainedblock, startTime} from "./Board";
 export let openedblock = 0;
@@ -42,7 +43,7 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick }) => {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            player_name: 'Player 2',
+                            player_name: UserName,
                             time_taken: timeTaken,
                         }),
                     })
