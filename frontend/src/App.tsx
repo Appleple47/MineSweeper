@@ -5,8 +5,10 @@ import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
 import { numberOfMine, size } from './components/Board';
 import { gameovered } from "./components/Cell";
+// import {asyncTable} from "../../backend/src/server"
 
 function App() {
+  // asyncTable();
   const [gameStarted, setGameStarted] = useState(false);
   const [board, setBoard] = useState<Board>(() => generateBoard(size, size, numberOfMine));
   if (!gameStarted) {

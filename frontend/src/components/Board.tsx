@@ -3,9 +3,12 @@ import type { Board } from "../types/types";
 import { generateBoard } from "../utils/board";
 import {Cell} from "./Cell";
 export const size = 15;
-export const numberOfMine = Math.floor(size * size / 10);
+export const numberOfMine = 2;
+// Math.floor(size * size / 10);
 export let chainedblock = 0;
 export let firstblock = false;
+export let startTime = 0;
+
 interface Props {
     board: Board;
     setBoard: React.Dispatch<React.SetStateAction<Board>>;
@@ -15,6 +18,8 @@ const screenSize = Math.min(window.innerWidth, window.innerHeight);
 const cellSize = Math.floor(screenSize / size) * 0.65;
 
 export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {
+    startTime = Date.now();
+
     const handleClick = (r: number, c: number) => {
         if (!firstblock) {
             let newBoard: Board;
@@ -81,3 +86,4 @@ function chainOpen(board: Board, cell: Board[0][0]): void {
         }
     }
 }
+

@@ -1,15 +1,16 @@
-import type {Board, Cell as CellType} from "../types/types";
-import { size, numberOfMine, chainedblock} from "./Board";
+import type { Cell as CellType} from "../types/types";
+import { size, numberOfMine, chainedblock, startTime} from "./Board";
 export let openedblock = 0;
 export let gameovered = false;
+export let timeTaken = 0;
+
 type Props = {
     cell: CellType;
-    board: Board;
     cellSize: number;
     onClick: () => void;
 };
 
-const getCellText = (cell: Cell): string => {
+const getCellText = (cell: CellType): string => {
     if(!cell.isOpen){
         return "";
     }
@@ -32,10 +33,28 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick }) => {
                 openedblock++;
                 cell.isOpen = true;
                 if(chainedblock + openedblock + numberOfMine === size * size){
-                    alert("🎊 Game Clear!");
+                    timeTaken = Math.floor((Date.now() - startTime)/1000);
+                    alert("🎊 Game Clear!\n in "+ timeTaken+" seconds!");
+
+                    fetch('http://localhost:3000/api/score', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            player_name: 'Player 2',
+                            time_taken: timeTaken,
+                        }),
+                    })
+                    .then(res => res.json())
+                    .then(data => console.log('Score API response:', data))
+                    .catch(err => console.error('API Error:', err));
                 }
             }
         }
+        console.log("o: "+ openedblock);
+        console.log("c: "+ chainedblock);
+        console.log("n: "+ numberOfMine);
     };
     return (
         <button
@@ -54,3 +73,4 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick }) => {
         </button>
     );
 };
+
