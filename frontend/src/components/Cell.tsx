@@ -15,22 +15,27 @@ type Props = {
 };
 
 const getCellText = (cell: CellType): string => {
-    if(!cell.isOpen){
-        return "";
+    let display = "";
+    if(cell.isOpen){
+        if(cell.isMine){
+            display = cell.openedMine ? "💥" : "💣";
+        }else if(cell.neighborMines > 0) {
+            display = cell.neighborMines.toString();
+        }
+    }else if(cell.isFlagged){
+        display = "🚩";
+    }else{
+        display = "";
     }
-    if(cell.isMine){
-        return "💣";
-    }
-    return cell.neighborMines > 0 ? cell.neighborMines.toString() : "";
+    return display;
 };
-
 export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board}) => {
     const handleClick = () => {
         if(!gameovered){
             onClick();
             if(cell.isMine && openedblock > 0){
                 const newBoard = board.map((row) => row.map((c) => ({ ...c })));
-                cell.isOpen = true;
+                newBoard[cell.row][cell.col].openedMine = true;
                 for(const mine of posOfmine){
                     newBoard[mine[0]][mine[1]].isOpen = true;
                 }

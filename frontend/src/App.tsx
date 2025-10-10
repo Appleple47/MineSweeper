@@ -1,24 +1,39 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import { BoardComponent } from './components/Board';
 import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
 import { numberOfMine, size } from './components/Board';
 import { gameovered } from "./components/Cell";
+import Timer from './components/timer';
 export let UserName = ' ';
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [board, setBoard] = useState<Board>(() => generateBoard(size, size, numberOfMine));
   const [username, setUsername] = useState('');
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [start, setStart] = useState(0);
+
   const startGame = () => {
+
     if (username.trim() !== '') {
       UserName = username;
+      setStart(Date.now());
+      setElapsedTime(0);
       setGameStarted(true);
     } else {
-      alert('ユーザー名を入力してください。');
+      alert('名前を入力してください。\nInput your username.');
     }
   };
+
+  useEffect(() => {
+    if (!gameStarted) return;
+    const timer = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [gameStarted, start]);
 
   if (!gameStarted) {
     return (
@@ -113,6 +128,7 @@ function App() {
       </div>
     );
   }
+
   return (
     <div style={{
       flexDirection: "column",
@@ -122,11 +138,16 @@ function App() {
       color: "black",
     }}>
       <h1>Mine Sweeper ⛏️</h1>
-      <h1>{username}</h1>
+      <h2>👤 {username}</h2>
+      <Timer start={start} />
       <BoardComponent board={board} setBoard={setBoard} />
 
       <button
-        onClick={() => setBoard(generateBoard(size, size, numberOfMine))}
+        onClick={() => {
+          setBoard(generateBoard(size, size, numberOfMine));
+          setStart(Date.now());
+          setElapsedTime(0);
+        }}
         style={{
           fontSize: "1.5rem",
           padding: "1rem 2rem",

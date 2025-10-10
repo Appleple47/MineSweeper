@@ -10,6 +10,8 @@ export const generateBoard = (rows: number, cols: number, mineCount: number): Bo
             row: row,
             col: col,
             neighborMines: 0,
+            openedMine: false,
+            isflagged: false,
         }))
     );
 
