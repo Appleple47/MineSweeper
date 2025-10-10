@@ -3,8 +3,7 @@ import type { Board } from "../types/types";
 import { generateBoard } from "../utils/board";
 import {Cell} from "./Cell";
 export const size = 15;
-export const numberOfMine = 2;
-// Math.floor(size * size / 10);
+export const numberOfMine = Math.floor(size * size / 10);
 export let chainedblock = 0;
 export let firstblock = false;
 export let startTime = 0;
@@ -38,11 +37,9 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {
         }else{
             const newBoard = board.map((row) => row.map((cell) => ({ ...cell })));
             newBoard[r][c].isOpen = true;
-        
             if (newBoard[r][c].neighborMines === 0 && !newBoard[r][c].isMine) {
                 chainOpen(newBoard, newBoard[r][c]);
             }
-        
             setBoard(newBoard);
         }
     };
@@ -57,9 +54,16 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {
                 row.map((cell, c) => (
                     <Cell 
                         key={`${r}-${c}`}
-                        cell={cell} 
+                        cell={cell}
                         cellSize={cellSize}
-                        onClick={() => handleClick(r, c)} 
+                        board={board}
+                        onClick={(newBoard) => {
+                            if (newBoard) {
+                                setBoard(newBoard);
+                            } else {
+                                handleClick(r, c);
+                            }
+                        }}
                     />
                 ))
             )}
@@ -77,8 +81,8 @@ function chainOpen(board: Board, cell: Board[0][0]): void {
             const nr = cell.row + move[i], nc = cell.col + move[j];
             if(0 <= nr && nr < board.length && 0 <= nc && nc < board[0].length 
                 && !board[nr][nc].isMine && !board[nr][nc].isOpen){
-                board[nr][nc].isOpen = true;
                 chainedblock++;
+                board[nr][nc].isOpen = true;
                 if(board[nr][nc].neighborMines === 0) {
                     chainOpen(board, board[nr][nc]);
                 }
@@ -86,4 +90,3 @@ function chainOpen(board: Board, cell: Board[0][0]): void {
         }
     }
 }
-

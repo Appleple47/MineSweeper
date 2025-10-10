@@ -1,6 +1,8 @@
+import React from "react";
 import { UserName } from "../App";
-import type { Cell as CellType} from "../types/types";
+import type { Board, Cell as CellType} from "../types/types";
 import { size, numberOfMine, chainedblock, startTime} from "./Board";
+import { posOfmine } from "../utils/board";
 export let openedblock = 0;
 export let gameovered = false;
 export let timeTaken = 0;
@@ -8,7 +10,8 @@ export let timeTaken = 0;
 type Props = {
     cell: CellType;
     cellSize: number;
-    onClick: () => void;
+    onClick: (newBoard?: Board) => void;
+    board: Board;
 };
 
 const getCellText = (cell: CellType): string => {
@@ -21,22 +24,26 @@ const getCellText = (cell: CellType): string => {
     return cell.neighborMines > 0 ? cell.neighborMines.toString() : "";
 };
 
-export const Cell: React.FC<Props> = ({ cell, cellSize, onClick }) => {
+export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board}) => {
     const handleClick = () => {
         if(!gameovered){
             onClick();
             if(cell.isMine && openedblock > 0){
-                cell.isOpen=true;
-                alert("💣 Game Over!");
+                const newBoard = board.map((row) => row.map((c) => ({ ...c })));
+                cell.isOpen = true;
+                for(const mine of posOfmine){
+                    newBoard[mine[0]][mine[1]].isOpen = true;
+                }
                 gameovered = true;
+                onClick(newBoard);
+                setTimeout(() => alert("💣 Game Over!"), 100);
             }
             if(!cell.isOpen){
                 openedblock++;
                 cell.isOpen = true;
-                if(chainedblock + openedblock + numberOfMine === size * size){
+                if(!(chainedblock + openedblock + numberOfMine < size * size)){
                     timeTaken = Math.floor((Date.now() - startTime)/1000);
                     alert("🎊 Game Clear!\n in "+ timeTaken+" seconds!");
-
                     fetch('http://localhost:3000/api/score', {
                         method: 'POST',
                         headers: {
@@ -74,4 +81,3 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick }) => {
         </button>
     );
 };
-

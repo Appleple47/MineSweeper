@@ -1,6 +1,8 @@
 import type { Board } from "../types/types";
+export let posOfmine: [number, number][] = [];
 
 export const generateBoard = (rows: number, cols: number, mineCount: number): Board => {
+    posOfmine = [];
     const board: Board = Array.from({ length: rows }, (_, row) =>
         Array.from({ length: cols }, (_, col) => ({
             isMine: false,
@@ -17,29 +19,21 @@ export const generateBoard = (rows: number, cols: number, mineCount: number): Bo
         const c = Math.floor(Math.random() * cols);
         if(!board[r][c].isMine){
             board[r][c].isMine = true;
+            posOfmine.push([r,c]);
             placed++;
         }
     }
-
     const move = [-1, 0, 1];
-    for(let r = 0; r < rows; r++){
-        for(let c = 0; c < cols; c++){
-            if(board[r][c].isMine){
-                continue;
-            }
-            let count = 0;
-            for(let i = 0; i < 3; i++){
-                for(let j = 0; j < 3; j++){
-                    if(i === 1 && j === 1){
-                        continue;
-                    }
-                    const nr = r + move[i], nc = c + move[j];
-                    if(0 <= nr&& nr < rows && 0 <= nc && nc < cols && board[nr][nc].isMine){
-                        count++;
+    for(let mine of posOfmine){
+        for(let i = 0; i < 3; i++){
+            for(let j = 0; j < 3; j++){
+                if(!(i === 1 && j === 1)){
+                    const nr = mine[0] + move[i], nc = mine[1] + move[j];
+                    if(0 <= nr&& nr < rows && 0 <= nc && nc < cols){
+                        board[nr][nc].neighborMines++;
                     }
                 }
             }
-            board[r][c].neighborMines = count;
         }
     }
     return board; 
