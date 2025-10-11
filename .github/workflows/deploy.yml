@@ -7,29 +7,41 @@ on:
 
 jobs:
   build-and-deploy:
+    # ★★★ 修正 1: 権限の追加 ★★★
     permissions: 
-      contents: read
-      pages: write  
-      id-token: write
-
+      contents: write # リポジトリへの書き込み権限 (gh-pagesブランチへのプッシュに必要)
+      pages: write    # Pages のデプロイ権限
+      id-token: write # 認証トークンの発行権限 (actions/deploy-pages利用時に推奨)
+    # ★★★★★★★★★★★★★★★★★★★★
+      
     runs-on: ubuntu-latest
+    
     steps:
+    
       - name: Checkout Repository
         uses: actions/checkout@v4
+        
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          
       - name: Install dependencies and build
         run: |
+          # frontend フォルダに移動し、ビルドを実行
           cd frontend
           npm install
           npm run build
+          # ★★★ 確認: この時点で 'frontend/dist' が作成される ★★★
           
+      # 4. GitHub Pages へのデプロイ
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          # ★★★ 修正 2: パスの変更 ★★★
+          publish_dir: ./frontend/dist 
+          # ★★★★★★★★★★★★★★★★★★
           force_orphan: true
-          
+          # Jekyll の干渉を防ぐ設定を明示的に有効化（安全のため）
+          enable_jekyll: false
