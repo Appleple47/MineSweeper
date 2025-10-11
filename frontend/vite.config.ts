@@ -5,7 +5,7 @@ export default defineConfig({
   base: '/MineSweeper/', 
   plugins: [react()],
   build: {
-    outDir: '../dist', 
+    outDir: '../docs', 
     emptyOutDir: true,
   }
 })
