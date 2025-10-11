@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/board.tsx","./src/components/cell.tsx","./src/components/timer.tsx","./src/types/types.ts","./src/utils/board.ts"],"errors":true,"version":"5.9.3"}

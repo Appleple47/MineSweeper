@@ -1,7 +1,14 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import react from '@vitejs/plugin-react-swc'
 
-// https://vite.dev/config/
+const REPO_NAME = "MineSweeper"; 
 export default defineConfig({
+  base: `/${REPO_NAME}/`,
+
   plugins: [react()],
+  
+  build: {
+    outDir: '../dist', 
+    emptyOutDir: true,
+  }
 })
