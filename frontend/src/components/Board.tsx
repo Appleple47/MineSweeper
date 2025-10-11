@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import type { Board } from "../types/types";
 import { generateBoard } from "../utils/board";
 import {Cell} from "./Cell";
+
 export const size = 15;
 export const numberOfMine = Math.floor(size * size / 10);
 export let chainedblock = 0;
 export let firstblock = false;
-export let startTime = 0;
+export function resetBoardState() {
+    chainedblock = 0;
+    firstblock = false;
+}
 
 interface Props {
     board: Board;
@@ -16,10 +20,19 @@ interface Props {
 const screenSize = Math.min(window.innerWidth, window.innerHeight);
 const cellSize = Math.floor(screenSize / size) * 0.65;
 
-export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {
-    startTime = Date.now();
+export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {  // ← 修正
+    const [isGameActive, setIsGameActive] = useState(true);
+    const startTimeRef = useRef<number>(0);
+
+    const handleGameClear = () => {
+        setIsGameActive(false);
+    };
+    const handleGameOver = () => {
+        setIsGameActive(false);
+    };
 
     const handleClick = (r: number, c: number) => {
+        if (!isGameActive) return;
         if (!firstblock) {
             let newBoard: Board;
             while (true) {
@@ -30,6 +43,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {
             }
             newBoard[r][c].isOpen = true;
             firstblock = true;
+            startTimeRef.current = Date.now();
             if (newBoard[r][c].neighborMines === 0) {
                 chainOpen(newBoard, newBoard[r][c]);
             }
@@ -57,6 +71,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {
                         cell={cell}
                         cellSize={cellSize}
                         board={board}
+                        startTime={startTimeRef.current}
                         onClick={(newBoard) => {
                             if (newBoard) {
                                 setBoard(newBoard);
@@ -64,6 +79,8 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {
                                 handleClick(r, c);
                             }
                         }}
+                        onGameClear={handleGameClear}
+                        onGameOver={handleGameOver} 
                     />
                 ))
             )}
