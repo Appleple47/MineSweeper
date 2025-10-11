@@ -1,23 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 
-const REPO_NAME = "MineSweeper"; 
 export default defineConfig({
-  base: `/${REPO_NAME}/`,
+  base: './',
 
   plugins: [react()],
   
   build: {
     outDir: '../dist', 
     emptyOutDir: true,
-    assetsDir: '',
-    rollupOptions: {
-      output: {
-        manualChunks: undefined,
-        entryFileNames: `assets/[name]-[hash].js`,
-        chunkFileNames: `assets/[name]-[hash].js`,
-        assetFileNames: `assets/[name]-[hash].[ext]`,
-      }
-    }
   }
 })
