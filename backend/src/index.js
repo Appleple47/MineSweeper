@@ -27,56 +27,84 @@ async function initializeTable() {
 initializeTable();
 
 exports.handler = async (event) => {
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Content-Type': 'application/json'
-    };
-    
-    if (event.httpMethod === 'OPTIONS') {
+        // console.log('Full event:', JSON.stringify(event, null, 2));
+        // console.log('httpMethod:', event.httpMethod);
+        // console.log('path:', event.path);
+        // console.log('body:', event.body);
+        
+        await initializeTable();
+        
+        const headers = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 
+            'Content-Type': 'application/json'
+        };
+        
+        const method = event.httpMethod ? event.httpMethod.toUpperCase() : null;
+    if (method === 'OPTIONS') {
         return {
             statusCode: 200,
             headers,
             body: ''
         };
     }
+    if (method === 'GET') {
+        try {
+            const result = await pool.query(
+                `SELECT player_name, time_taken, blocks, created_at FROM scores ORDER BY time_taken ASC LIMIT 10;`
+            );
 
-    if (event.httpMethod !== 'POST' || event.path !== '/prod/scores') {
-        return {
-            statusCode: 404,
-            headers,
-            body: JSON.stringify({ message: "Not Found" })
-        };
-    }
-
-    try {
-        const body = JSON.parse(event.body);
-        const { player_name, time_taken, blocks } = body;
-
-        if (typeof time_taken !== 'number' || !player_name) {
             return {
-                statusCode: 400,
+                statusCode: 200,
                 headers,
-                body: JSON.stringify({ message: 'Invalid data' })
+                body: JSON.stringify(result.rows)
+            };
+        } catch (error) {
+            console.error('DB Select Error:', error);
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ message: 'Failed to retrieve scores (DB Error)' })
             };
         }
-
-        await pool.query(
-            `INSERT INTO scores(player_name, time_taken, blocks) VALUES($1, $2, $3);`,
-            [player_name, time_taken, blocks]
-        );
-
-        return {
-            statusCode: 201,
-            headers,
-            body: JSON.stringify({ message: 'Score saved successfully' })
-        };
-    } catch (error) {
-        console.error('DB Insert Error:', error);
-        return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ message: 'Database error' })
-        };
     }
+    if (event.httpMethod === 'POST') {
+        try {
+            const body = JSON.parse(event.body);
+            const { player_name, time_taken, blocks } = body;
+    
+            if (typeof time_taken !== 'number' || !player_name) {
+                return {
+                    statusCode: 400,
+                    headers,
+                    body: JSON.stringify({ message: 'Invalid data' })
+                };
+            }
+    
+            await pool.query(
+                `INSERT INTO scores(player_name, time_taken, blocks) VALUES($1, $2, $3);`,
+                [player_name, time_taken, blocks]
+            );
+    
+            return {
+                statusCode: 201,
+                headers,
+                body: JSON.stringify({ message: 'Score saved successfully' })
+            };
+        } catch (error) {
+            console.error('DB Insert Error:', error);
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ message: 'Database error' })
+            };
+        }
+    }
+    return {
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({ message: "DEBUG: Final Fallback 404." }) // メッセージを再変更
+    };
 };
+
