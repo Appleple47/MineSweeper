@@ -1,11 +1,10 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  base: '/MineSweeper/', 
   plugins: [react()],
+  base: '/MineSweeper/', 
   build: {
-    outDir: '../docs', 
-    emptyOutDir: true,
-  }
-})
+    outDir: 'dist', 
+  },
+});
