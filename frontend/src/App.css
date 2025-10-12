@@ -1,32 +1,30 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  /* 不要な max-width と margin を削除し、画面いっぱいに広げる */
   text-align: center;
+  display: flex;
+  justify-content: center; /* 水平中央 */
+  align-items: center;     /* 垂直中央 */
+  min-height: 100vh;       /* 画面の高さいっぱい */
+  width: 100%;             /* 画面の幅いっぱい */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* body, #root の重複定義を整理し、bodyは背景用にする */
+body, style {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  /* display: flex; は #root に移譲 */
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+
+/* (中略: .logo, .card, @keyframesなどは省略) */
+
 body {
   margin: 0;
   padding: 0;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-
-
+  /* display: flex; 削除 */
+  
+  /* 背景パターンは維持 */
   background:
   radial-gradient(black 3px, transparent 4px),
   radial-gradient(black 3px, transparent 4px),
@@ -37,8 +35,7 @@ body {
   background-size: 109px 109px, 109px 109px,100% 6px, 109px 109px, 109px 109px;
   background-position: 54px 55px, 0px 0px, 0px 0px, 0px 0px, 0px 0px;
   
-  /* 
-  copied from https://projects.verou.me/css3patterns/#
+  /* copied from https://projects.verou.me/css3patterns/#
   */
 }
 

@@ -17,8 +17,13 @@ interface Props {
     setBoard: React.Dispatch<React.SetStateAction<Board>>;
 }
 
-const screenSize = Math.min(window.innerWidth, window.innerHeight);
-const cellSize = Math.floor(screenSize / size) * 0.65;
+const calculateCellSize = () => {
+    const containerSize = Math.min(window.innerWidth, 500);
+    const safePadding = 30;
+    return Math.floor((containerSize - safePadding) / size);
+};
+
+const initialCellSize = calculateCellSize();
 
 export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {  // ‚Üê ‰øÆÊ≠£
     const [isGameActive, setIsGameActive] = useState(true);
@@ -30,7 +35,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {  // ‚Ü
     const handleGameOver = () => {
         setIsGameActive(false);
     };
-
+    const [currentCellSize, setCurrentCellSize] = useState(initialCellSize);
     const handleClick = (r: number, c: number) => {
         if (!isGameActive) return;
         if (!firstblock) {
@@ -60,16 +65,21 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {  // ‚Ü
     return (
         <div style={{
             display: "grid",
-            gridTemplateColumns: `repeat(${size}, ${cellSize+6}px)`,
-            gap: 0,
+            justifyContent: "center", 
+            alignContent: "center",
+
+            gridTemplateColumns: `repeat(${size}, ${currentCellSize+5}px)`, 
             paddingBottom: "50px",
+            width: `${currentCellSize * size + (size - 1)}px`, 
+
+            borderRadius: "8px",
         }}>
             {board.map((row, r) =>
                 row.map((cell, c) => (
                     <Cell 
                         key={`${r}-${c}`}
                         cell={cell}
-                        cellSize={cellSize}
+                        cellSize={currentCellSize}
                         board={board}
                         startTime={startTimeRef.current}
                         onClick={(newBoard) => {
@@ -87,6 +97,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {  // ‚Ü
         </div>
     );
 };
+
 
 function chainOpen(board: Board, cell: Board[0][0]): void {
     const move = [-1, 0, 1];

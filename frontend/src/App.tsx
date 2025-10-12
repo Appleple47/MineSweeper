@@ -3,9 +3,11 @@ import './App.css';
 import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
 import { numberOfMine, size, BoardComponent, resetBoardState } from './components/Board';
-import { gameovered, resetCellState} from "./components/Cell";
+import { gameovered, resetCellState } from "./components/Cell";
 import * as CellModule from "./components/Cell";
 export let UserName = ' ';
+export let flaggingmode = false;
+
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false);
@@ -13,7 +15,7 @@ function App() {
   const [username, setUsername] = useState('');
   const [elapsedTime, setElapsedTime] = useState(0);
   const [start, setStart] = useState(0);
-  const [isGameOver, setIsGameOver] = useState(false);  
+  const [isGameOver, setIsGameOver] = useState(false);
 
   const startGame = () => {
     if (username.trim() !== '') {
@@ -62,11 +64,11 @@ function App() {
         </h1>
 
         <div style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "1rem",
-          }}>
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "1rem",
+        }}>
           <input
             type="text"
             placeholder="Enter your username"
@@ -104,7 +106,7 @@ function App() {
       </div>
     );
   }
-  if(gameovered){
+  if (gameovered) {
     return (
       <div style={{
         flexDirection: "column",
@@ -131,7 +133,7 @@ function App() {
           onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
           onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
         >
-          RETURN
+          RETRY
         </button>
       </div>
     );
@@ -139,8 +141,10 @@ function App() {
 
   return (
     <div style={{
+      display: "flex",
       flexDirection: "column",
       alignItems: "center",
+      justifyContent: "center",
       minHeight: "100vh",
       gap: "1rem",
       color: "black",
@@ -149,29 +153,56 @@ function App() {
       <h2>👤 {username}</h2>
       <h2>⏰Time: {elapsedTime}</h2>
       <BoardComponent board={board} setBoard={setBoard} />
+      <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          width: "min(400px, 90vw)",
+          marginTop: "20px",
+        }}>
+        <button
+          onClick={() => {
+            setBoard(generateBoard(size, size, numberOfMine));
+            setStart(Date.now());
+            setElapsedTime(0);
+          }}
+          style={{
+            fontSize: "1.5rem",
+            padding: "1rem 2rem",
+            cursor: "pointer",
+            background: "#667eea",
+            color: "white",
+            border: "none",
+            borderRadius: "10px",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            transition: "transform 0.2s",
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+          onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+        >
+          RESTART
+        </button>
 
-      <button
-        onClick={() => {
-          setBoard(generateBoard(size, size, numberOfMine));
-          setStart(Date.now());
-          setElapsedTime(0);
-        }}
-        style={{
-          fontSize: "1.5rem",
-          padding: "1rem 2rem",
-          cursor: "pointer",
-          background: "#667eea",
-          color: "white",
-          border: "none",
-          borderRadius: "10px",
-          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-          transition: "transform 0.2s",
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-        onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-      >
-        RESTART
-      </button>
+        <button
+          onClick={() => {
+            flaggingmode = !flaggingmode;
+          }}
+          style={{
+            fontSize: "1.5rem",
+            padding: "1rem 2rem",
+            cursor: "pointer",
+            background: flaggingmode ? '#e91e63' : '#a0aec0', 
+            color: "white",
+            border: "none",
+            borderRadius: "10px",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            transition: "transform 0.2s",
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+          onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+        >
+          {flaggingmode ? "🚩: ON" :" 🚩: OFF"}
+        </button>
+      </div>
     </div>
   );
 }
