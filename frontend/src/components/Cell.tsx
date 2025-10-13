@@ -40,10 +40,10 @@ const getCellText = (cell: CellType): string => {
 export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTime, onGameClear, onGameOver}) => {
     const handleClick = () => {
         if(gameovered) return;
-        if(cell.isflagged) return;
         if(flaggingmode){
             cell.isflagged = !cell.isflagged;
         }else{
+            if(cell.isflagged) return;
             if(!gameovered){
                 onClick();
                 if(cell.isMine && openedblock > 0){
