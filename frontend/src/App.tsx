@@ -118,7 +118,10 @@ function App() {
         <h1>Mine Sweeper ⛏️</h1>
         <BoardComponent board={board} setBoard={setBoard} />
         <button
-          onClick={restartGame}
+          onClick={() => {
+            restartGame;
+            flaggingmode=false;
+          }}
           style={{
             fontSize: "1.5rem",
             padding: "1rem 2rem",
@@ -164,6 +167,7 @@ function App() {
             setBoard(generateBoard(size, size, numberOfMine));
             setStart(Date.now());
             setElapsedTime(0);
+            flaggingmode=false;
           }}
           style={{
             fontSize: "1.5rem",
