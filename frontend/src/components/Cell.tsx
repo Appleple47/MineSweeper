@@ -7,6 +7,7 @@ export let openedblock = 0;
 export let gameovered = false;
 const API_BASE_URL = "https://1r2mypgiag.execute-api.ap-southeast-2.amazonaws.com/prod";
 
+
 type Props = {
     cell: CellType;
     cellSize: number;
@@ -83,9 +84,9 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTim
                     }
                 }
             }
-            // console.log("o: "+ openedblock);
-            // console.log("c: "+ chainedblock);
-            // console.log("n: "+ numberOfMine);
+            console.log("opened blocks: "+ openedblock);
+            console.log("chained blocks: "+ chainedblock);
+            console.log("mines: "+ numberOfMine);
         };
     }
     return (

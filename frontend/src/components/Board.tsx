@@ -1,12 +1,13 @@
 import React, { useRef, useState } from "react";
 import type { Board } from "../types/types";
 import { generateBoard } from "../utils/board";
-import {Cell} from "./Cell";
+import {Cell, openedblock} from "./Cell";
 
 export const size = 15;
 export const numberOfMine = Math.floor(size * size / 10);
 export let chainedblock = 0;
 export let firstblock = false;
+
 export function resetBoardState() {
     chainedblock = 0;
     firstblock = false;

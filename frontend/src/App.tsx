@@ -23,6 +23,7 @@ function App() {
       setStart(Date.now());
       setElapsedTime(0);
       setGameStarted(true);
+      flaggingmode=false;
     } else {
       alert('名前を入力してください。\nInput your username.');
     }
@@ -35,6 +36,7 @@ function App() {
     setStart(Date.now());
     setElapsedTime(0);
     setIsGameOver(false);
+    flaggingmode=false;
   };
 
   useEffect(() => {
@@ -119,7 +121,11 @@ function App() {
         <BoardComponent board={board} setBoard={setBoard} />
         <button
           onClick={() => {
-            restartGame;
+            resetCellState();
+            resetBoardState();
+            setBoard(generateBoard(size, size, numberOfMine));
+            setStart(Date.now());
+            setElapsedTime(0);
             flaggingmode=false;
           }}
           style={{
@@ -136,7 +142,7 @@ function App() {
           onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
           onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
         >
-          RETRY
+          RESTART
         </button>
       </div>
     );
@@ -164,6 +170,8 @@ function App() {
         }}>
         <button
           onClick={() => {
+            resetCellState();
+            resetBoardState();
             setBoard(generateBoard(size, size, numberOfMine));
             setStart(Date.now());
             setElapsedTime(0);
@@ -185,7 +193,6 @@ function App() {
         >
           RESTART
         </button>
-
         <button
           onClick={() => {
             flaggingmode = !flaggingmode;
