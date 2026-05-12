@@ -3,10 +3,8 @@ import './App.css';
 import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
 import { numberOfMine, size, BoardComponent, resetBoardState } from './components/Board';
-import { gameovered, resetCellState } from "./components/Cell";
-import * as CellModule from "./components/Cell";
+import { resetCellState } from "./components/Cell";
 export let UserName = ' ';
-export let flaggingmode = false;
 
 
 function App() {
@@ -16,6 +14,8 @@ function App() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [start, setStart] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [flaggingMode, setFlaggingMode] = useState(false);
+  const [gameKey, setGameKey] = useState(0);
 
   const startGame = () => {
     if (username.trim() !== '') {
@@ -23,7 +23,7 @@ function App() {
       setStart(Date.now());
       setElapsedTime(0);
       setGameStarted(true);
-      flaggingmode=false;
+      setFlaggingMode(false);
     } else {
       alert('名前を入力してください。\nInput your username.');
     }
@@ -36,7 +36,8 @@ function App() {
     setStart(Date.now());
     setElapsedTime(0);
     setIsGameOver(false);
-    flaggingmode=false;
+    setFlaggingMode(false);
+    setGameKey(k => k + 1);
   };
 
   useEffect(() => {
@@ -108,9 +109,10 @@ function App() {
       </div>
     );
   }
-  if (gameovered) {
+  if (isGameOver) {
     return (
       <div style={{
+        display: "flex",
         flexDirection: "column",
         alignItems: "center",
         minHeight: "100vh",
@@ -118,16 +120,16 @@ function App() {
         color: "black",
       }}>
         <h1>Mine Sweeper ⛏️</h1>
-        <BoardComponent board={board} setBoard={setBoard} />
+        <BoardComponent
+          key={gameKey}
+          board={board}
+          setBoard={setBoard}
+          flaggingMode={false}
+          onGameOver={() => setIsGameOver(true)}
+          onGameClear={() => setIsGameOver(true)}
+        />
         <button
-          onClick={() => {
-            resetCellState();
-            resetBoardState();
-            setBoard(generateBoard(size, size, numberOfMine));
-            setStart(Date.now());
-            setElapsedTime(0);
-            flaggingmode=false;
-          }}
+          onClick={restartGame}
           style={{
             fontSize: "1.5rem",
             padding: "1rem 2rem",
@@ -161,7 +163,14 @@ function App() {
       <h1>Mine Sweeper ⛏️</h1>
       <h2>👤 {username}</h2>
       <h2>⏰Time: {elapsedTime}</h2>
-      <BoardComponent board={board} setBoard={setBoard} />
+      <BoardComponent
+        key={gameKey}
+        board={board}
+        setBoard={setBoard}
+        flaggingMode={flaggingMode}
+        onGameOver={() => setIsGameOver(true)}
+        onGameClear={() => setIsGameOver(true)}
+      />
       <div style={{
           display: "flex",
           justifyContent: "space-between",
@@ -169,14 +178,7 @@ function App() {
           marginTop: "20px",
         }}>
         <button
-          onClick={() => {
-            resetCellState();
-            resetBoardState();
-            setBoard(generateBoard(size, size, numberOfMine));
-            setStart(Date.now());
-            setElapsedTime(0);
-            flaggingmode=false;
-          }}
+          onClick={restartGame}
           style={{
             fontSize: "1.5rem",
             padding: "1rem 2rem",
@@ -194,14 +196,12 @@ function App() {
           RESTART
         </button>
         <button
-          onClick={() => {
-            flaggingmode = !flaggingmode;
-          }}
+          onClick={() => setFlaggingMode(f => !f)}
           style={{
             fontSize: "1.5rem",
             padding: "1rem 2rem",
             cursor: "pointer",
-            background: flaggingmode ? '#e91e63' : '#a0aec0', 
+            background: flaggingMode ? '#e91e63' : '#a0aec0',
             color: "white",
             border: "none",
             borderRadius: "10px",
@@ -211,7 +211,7 @@ function App() {
           onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
           onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
         >
-          {flaggingmode ? "🚩: ON" :" 🚩: OFF"}
+          {flaggingMode ? "🚩: ON" : " 🚩: OFF"}
         </button>
       </div>
     </div>

@@ -16,6 +16,9 @@ export function resetBoardState() {
 interface Props {
     board: Board;
     setBoard: React.Dispatch<React.SetStateAction<Board>>;
+    flaggingMode: boolean;
+    onGameOver: () => void;
+    onGameClear: () => void;
 }
 
 const calculateCellSize = () => {
@@ -26,15 +29,17 @@ const calculateCellSize = () => {
 
 const initialCellSize = calculateCellSize();
 
-export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {  // ‚Üê ‰øÆÊ≠£
+export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode, onGameOver, onGameClear }) => {
     const [isGameActive, setIsGameActive] = useState(true);
     const startTimeRef = useRef<number>(0);
 
     const handleGameClear = () => {
         setIsGameActive(false);
+        onGameClear();
     };
     const handleGameOver = () => {
         setIsGameActive(false);
+        onGameOver();
     };
     const [currentCellSize, setCurrentCellSize] = useState(initialCellSize);
     const handleClick = (r: number, c: number) => {
@@ -77,7 +82,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {  // ‚Ü
         }}>
             {board.map((row, r) =>
                 row.map((cell, c) => (
-                    <Cell 
+                    <Cell
                         key={`${r}-${c}`}
                         cell={cell}
                         cellSize={currentCellSize}
@@ -91,7 +96,9 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard }) => {  // ‚Ü
                             }
                         }}
                         onGameClear={handleGameClear}
-                        onGameOver={handleGameOver} 
+                        onGameOver={handleGameOver}
+                        isGameActive={isGameActive}
+                        flaggingMode={flaggingMode}
                     />
                 ))
             )}

@@ -1,10 +1,9 @@
 import React from "react";
-import { UserName, flaggingmode } from "../App";
+import { UserName } from "../App";
 import type { Board, Cell as CellType} from "../types/types";
 import { size, numberOfMine, chainedblock} from "./Board";
 import { posOfmine } from "../utils/board";
 export let openedblock = 0;
-export let gameovered = false;
 const API_BASE_URL = "https://1r2mypgiag.execute-api.ap-southeast-2.amazonaws.com/prod";
 
 
@@ -16,11 +15,12 @@ type Props = {
     startTime: number;
     onGameClear: () => void;
     onGameOver: () => void;
+    isGameActive: boolean;
+    flaggingMode: boolean;
 };
 
 export function resetCellState() {
     openedblock = 0;
-    gameovered = false;
 }
 
 const getCellText = (cell: CellType): string => {
@@ -38,69 +38,63 @@ const getCellText = (cell: CellType): string => {
     }
     return display;
 };
-export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTime, onGameClear, onGameOver}) => {
+export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTime, onGameClear, onGameOver, isGameActive, flaggingMode}) => {
     const handleClick = () => {
-        if(gameovered) return;
-        if(flaggingmode){
-            cell.isflagged = !cell.isflagged;
-        }else{
-            if(cell.isflagged) return;
-            if(!gameovered){
-                onClick();
-                if(cell.isMine && openedblock > 0){
-                    const newBoard = board.map((row) => row.map((c) => ({ ...c })));
-                    newBoard[cell.row][cell.col].openedMine = true;
-                    for(const mine of posOfmine){
-                        newBoard[mine[0]][mine[1]].isOpen = true;
-                    }
-                    gameovered = true;
-                    onClick(newBoard);
-                    onGameOver();
-                    setTimeout(() => alert("💣 Game Over!"), 100);
-                    return;
-                }
-                if(!cell.isOpen){
-                    openedblock++;
-                    cell.isOpen = true;
-                    if(!(chainedblock + openedblock + numberOfMine < size * size)){
-                        const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-                        gameovered = true;
-                        onGameClear();
-                        alert("🎊 Game Clear!\n in "+ timeTaken+" seconds!");
-                        fetch(`${API_BASE_URL}/scores`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                player_name: UserName,
-                                time_taken: timeTaken,
-                                blocks: (size * size),
-                            }),
-                        })
-                        .then(res => res.json())
-                        .then(data => console.log('Score API response:', data))
-                        .catch(err => console.error('API Error:', err));
-                    }
-                }
+        if(!isGameActive) return;
+        if(flaggingMode){
+            const newBoard = board.map((row) => row.map((c) => ({ ...c })));
+            newBoard[cell.row][cell.col].isflagged = !newBoard[cell.row][cell.col].isflagged;
+            onClick(newBoard);
+            return;
+        }
+        if(cell.isflagged) return;
+        if(cell.isMine){
+            const newBoard = board.map((row) => row.map((c) => ({ ...c })));
+            newBoard[cell.row][cell.col].openedMine = true;
+            for(const mine of posOfmine){
+                newBoard[mine[0]][mine[1]].isOpen = true;
             }
-            console.log("opened blocks: "+ openedblock);
-            console.log("chained blocks: "+ chainedblock);
-            console.log("mines: "+ numberOfMine);
-        };
+            onClick(newBoard);
+            onGameOver();
+            setTimeout(() => alert("💣 Game Over!"), 100);
+            return;
+        }
+        onClick();
+        if(!cell.isOpen){
+            openedblock++;
+            if(!(chainedblock + openedblock + numberOfMine < size * size)){
+                const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+                onGameClear();
+                alert("🎊 Game Clear!\n in "+ timeTaken+" seconds!");
+                fetch(`${API_BASE_URL}/scores`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        player_name: UserName,
+                        time_taken: timeTaken,
+                        blocks: (size * size),
+                    }),
+                })
+                .then(res => res.json())
+                .then(data => console.log('Score API response:', data))
+                .catch(err => console.error('API Error:', err));
+            }
+        }
     }
     return (
         <button
             onClick={handleClick}
             style={{
                 width: cellSize,
-                height: cellSize, 
+                height: cellSize,
                 border: "1px solid #666",
                 background: cell.isOpen ? "#ddd" : "#999",
                 fontSize: `${cellSize * 0.5}px`,
                 justifyContent: "center",
                 alignItems: "center",
-                cursor: gameovered ? "default" : "pointer",
+                cursor: isGameActive ? "pointer" : "default",
             }}
         >
             {getCellText(cell)}
