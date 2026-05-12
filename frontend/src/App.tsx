@@ -4,7 +4,6 @@ import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
 import { numberOfMine, size, BoardComponent, resetBoardState } from './components/Board';
 import { resetCellState } from "./components/Cell";
-import * as CellModule from "./components/Cell";
 export let UserName = ' ';
 
 
@@ -125,7 +124,7 @@ function App() {
           key={gameKey}
           board={board}
           setBoard={setBoard}
-          flaggingMode={flaggingMode}
+          flaggingMode={false}
           onGameOver={() => setIsGameOver(true)}
           onGameClear={() => setIsGameOver(true)}
         />

@@ -48,8 +48,7 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTim
             return;
         }
         if(cell.isflagged) return;
-        onClick();
-        if(cell.isMine && openedblock > 0){
+        if(cell.isMine){
             const newBoard = board.map((row) => row.map((c) => ({ ...c })));
             newBoard[cell.row][cell.col].openedMine = true;
             for(const mine of posOfmine){
@@ -60,6 +59,7 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTim
             setTimeout(() => alert("💣 Game Over!"), 100);
             return;
         }
+        onClick();
         if(!cell.isOpen){
             openedblock++;
             if(!(chainedblock + openedblock + numberOfMine < size * size)){
