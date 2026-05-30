@@ -1,5 +1,4 @@
 export type Cell = {
-    [x: string]: any;
     isMine: boolean;
     isOpen: boolean;
     row: number;

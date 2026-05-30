@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import type { Board } from "../types/types";
 import { generateBoard } from "../utils/board";
-import {Cell, openedblock} from "./Cell";
+import {Cell} from "./Cell";
 
 export const size = 15;
 export const numberOfMine = Math.floor(size * size / 10);
@@ -41,17 +41,14 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
         setIsGameActive(false);
         onGameOver();
     };
-    const [currentCellSize, setCurrentCellSize] = useState(initialCellSize);
+    const currentCellSize = initialCellSize;
     const handleClick = (r: number, c: number) => {
         if (!isGameActive) return;
         if (!firstblock) {
             let newBoard: Board;
-            while (true) {
+            do {
                 newBoard = generateBoard(size, size, numberOfMine);
-                if (!newBoard[r][c].isMine){
-                    break;
-                }
-            }
+            } while (newBoard[r][c].isMine);
             newBoard[r][c].isOpen = true;
             firstblock = true;
             startTimeRef.current = Date.now();
