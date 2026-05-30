@@ -48,7 +48,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
             let newBoard: Board;
             do {
                 newBoard = generateBoard(size, size, numberOfMine);
-            } while (newBoard[r][c].isMine);
+            } while (newBoard[r][c].isMine || newBoard[r][c].neighborMines !== 0);
             newBoard[r][c].isOpen = true;
             firstblock = true;
             startTimeRef.current = Date.now();
@@ -73,7 +73,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
 
             gridTemplateColumns: `repeat(${size}, ${currentCellSize+5}px)`, 
             paddingBottom: "50px",
-            width: `${currentCellSize * size + (size - 1)}px`, 
+            width: `${(currentCellSize + 5) * size}px`,
 
             borderRadius: "8px",
         }}>

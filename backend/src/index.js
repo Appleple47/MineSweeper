@@ -24,8 +24,6 @@ async function initializeTable() {
     }
 }
 
-initializeTable();
-
 exports.handler = async (event) => {
         // console.log('Full event:', JSON.stringify(event, null, 2));
         // console.log('httpMethod:', event.httpMethod);

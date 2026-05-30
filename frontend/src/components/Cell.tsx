@@ -47,6 +47,7 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTim
             onClick(newBoard);
             return;
         }
+        if(cell.isOpen) return;
         if(cell.isflagged) return;
         if(cell.isMine){
             const newBoard = board.map((row) => row.map((c) => ({ ...c })));
