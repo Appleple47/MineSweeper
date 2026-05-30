@@ -1,17 +1,13 @@
 import React, { useRef, useState } from "react";
 import type { Board } from "../types/types";
 import { generateBoard } from "../utils/board";
-import {Cell} from "./Cell";
+import { Cell } from "./Cell";
+import { UserName } from "../App";
 
 export const size = 15;
 export const numberOfMine = Math.floor(size * size / 10);
-export let chainedblock = 0;
-export let firstblock = false;
 
-export function resetBoardState() {
-    chainedblock = 0;
-    firstblock = false;
-}
+const API_BASE_URL = "https://1r2mypgiag.execute-api.ap-southeast-2.amazonaws.com/prod";
 
 interface Props {
     board: Board;
@@ -31,36 +27,56 @@ const initialCellSize = calculateCellSize();
 
 export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode, onGameOver, onGameClear }) => {
     const [isGameActive, setIsGameActive] = useState(true);
+    const [hasClickedOnce, setHasClickedOnce] = useState(false);
     const startTimeRef = useRef<number>(0);
+    const chainedblockRef = useRef(0);
+    const openedblockRef = useRef(0);
 
-    const handleGameClear = () => {
-        setIsGameActive(false);
-        onGameClear();
-    };
     const handleGameOver = () => {
         setIsGameActive(false);
         onGameOver();
     };
+
+    const handleManualOpen = () => {
+        openedblockRef.current++;
+        if (chainedblockRef.current + openedblockRef.current + numberOfMine >= size * size) {
+            const timeTaken = Math.floor((Date.now() - startTimeRef.current) / 1000);
+            setIsGameActive(false);
+            onGameClear();
+            alert("🎊 Game Clear!\n in " + timeTaken + " seconds!");
+            fetch(`${API_BASE_URL}/scores`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    player_name: UserName,
+                    time_taken: timeTaken,
+                    blocks: (size * size),
+                }),
+            })
+            .then(res => res.json())
+            .then(data => console.log('Score API response:', data))
+            .catch(err => console.error('API Error:', err));
+        }
+    };
+
     const currentCellSize = initialCellSize;
     const handleClick = (r: number, c: number) => {
         if (!isGameActive) return;
-        if (!firstblock) {
+        if (!hasClickedOnce) {
             let newBoard: Board;
             do {
                 newBoard = generateBoard(size, size, numberOfMine);
             } while (newBoard[r][c].isMine || newBoard[r][c].neighborMines !== 0);
             newBoard[r][c].isOpen = true;
-            firstblock = true;
+            setHasClickedOnce(true);
             startTimeRef.current = Date.now();
-            if (newBoard[r][c].neighborMines === 0) {
-                chainOpen(newBoard, newBoard[r][c]);
-            }
+            chainedblockRef.current += chainOpen(newBoard, newBoard[r][c]);
             setBoard(newBoard);
-        }else{
+        } else {
             const newBoard = board.map((row) => row.map((cell) => ({ ...cell })));
             newBoard[r][c].isOpen = true;
             if (newBoard[r][c].neighborMines === 0 && !newBoard[r][c].isMine) {
-                chainOpen(newBoard, newBoard[r][c]);
+                chainedblockRef.current += chainOpen(newBoard, newBoard[r][c]);
             }
             setBoard(newBoard);
         }
@@ -68,13 +84,11 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
     return (
         <div style={{
             display: "grid",
-            justifyContent: "center", 
+            justifyContent: "center",
             alignContent: "center",
-
-            gridTemplateColumns: `repeat(${size}, ${currentCellSize+5}px)`, 
+            gridTemplateColumns: `repeat(${size}, ${currentCellSize+5}px)`,
             paddingBottom: "50px",
             width: `${(currentCellSize + 5) * size}px`,
-
             borderRadius: "8px",
         }}>
             {board.map((row, r) =>
@@ -84,7 +98,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
                         cell={cell}
                         cellSize={currentCellSize}
                         board={board}
-                        startTime={startTimeRef.current}
+                        hasClickedOnce={hasClickedOnce}
                         onClick={(newBoard) => {
                             if (newBoard) {
                                 setBoard(newBoard);
@@ -92,10 +106,10 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
                                 handleClick(r, c);
                             }
                         }}
-                        onGameClear={handleGameClear}
                         onGameOver={handleGameOver}
                         isGameActive={isGameActive}
                         flaggingMode={flaggingMode}
+                        onManualOpen={handleManualOpen}
                     />
                 ))
             )}
@@ -103,23 +117,22 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
     );
 };
 
-
-function chainOpen(board: Board, cell: Board[0][0]): void {
+function chainOpen(board: Board, cell: Board[0][0]): number {
+    let count = 0;
     const move = [-1, 0, 1];
-    for(let i = 0; i < 3; i++){
-        for(let j = 0; j < 3; j++){
-            if(i === 1 && j === 1){
-                continue;
-            }
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            if (i === 1 && j === 1) continue;
             const nr = cell.row + move[i], nc = cell.col + move[j];
-            if(0 <= nr && nr < board.length && 0 <= nc && nc < board[0].length 
-                && !board[nr][nc].isMine && !board[nr][nc].isOpen){
-                chainedblock++;
+            if (0 <= nr && nr < board.length && 0 <= nc && nc < board[0].length
+                && !board[nr][nc].isMine && !board[nr][nc].isOpen) {
                 board[nr][nc].isOpen = true;
-                if(board[nr][nc].neighborMines === 0) {
-                    chainOpen(board, board[nr][nc]);
+                count++;
+                if (board[nr][nc].neighborMines === 0) {
+                    count += chainOpen(board, board[nr][nc]);
                 }
             }
         }
     }
+    return count;
 }

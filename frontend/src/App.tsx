@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
-import { numberOfMine, size, BoardComponent, resetBoardState } from './components/Board';
-import { resetCellState } from "./components/Cell";
+import { numberOfMine, size, BoardComponent } from './components/Board';
 export let UserName = '';
 
 
@@ -30,8 +29,6 @@ function App() {
   };
 
   const restartGame = () => {
-    resetCellState();
-    resetBoardState();
     setBoard(generateBoard(size, size, numberOfMine));
     setStart(Date.now());
     setElapsedTime(0);
