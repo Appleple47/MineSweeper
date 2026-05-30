@@ -167,8 +167,8 @@ function App() {
         board={board}
         setBoard={setBoard}
         flaggingMode={flaggingMode}
-        onGameOver={() => setIsGameOver(true)}
-        onGameClear={() => setIsGameOver(true)}
+        onGameOver={handleGameOver}
+        onGameClear={handleGameClear}
         userName={username}
       />
       <div style={{
