@@ -1,7 +1,7 @@
 import React from "react";
 import { UserName } from "../App";
 import type { Board, Cell as CellType} from "../types/types";
-import { size, numberOfMine, chainedblock} from "./Board";
+import { size, numberOfMine, chainedblock, firstblock} from "./Board";
 import { posOfmine } from "../utils/board";
 export let openedblock = 0;
 const API_BASE_URL = "https://1r2mypgiag.execute-api.ap-southeast-2.amazonaws.com/prod";
@@ -49,7 +49,7 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTim
         }
         if(cell.isOpen) return;
         if(cell.isflagged) return;
-        if(cell.isMine){
+        if(cell.isMine && firstblock){
             const newBoard = board.map((row) => row.map((c) => ({ ...c })));
             newBoard[cell.row][cell.col].openedMine = true;
             for(const mine of posOfmine){
