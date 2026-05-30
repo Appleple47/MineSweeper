@@ -1,8 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import type { Board } from "../types/types";
 import { generateBoard } from "../utils/board";
 import { Cell } from "./Cell";
-import { UserName } from "../App";
 
 export const size = 15;
 export const numberOfMine = Math.floor(size * size / 10);
@@ -15,6 +14,7 @@ interface Props {
     flaggingMode: boolean;
     onGameOver: () => void;
     onGameClear: () => void;
+    userName: string;
 }
 
 const calculateCellSize = () => {
@@ -25,7 +25,7 @@ const calculateCellSize = () => {
 
 const initialCellSize = calculateCellSize();
 
-export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode, onGameOver, onGameClear }) => {
+export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode, onGameOver, onGameClear, userName }) => {
     const [isGameActive, setIsGameActive] = useState(true);
     const [hasClickedOnce, setHasClickedOnce] = useState(false);
     const startTimeRef = useRef<number>(0);
@@ -37,7 +37,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
         onGameOver();
     };
 
-    const handleManualOpen = () => {
+    const handleManualOpen = useCallback(() => {
         openedblockRef.current++;
         if (chainedblockRef.current + openedblockRef.current + numberOfMine >= size * size) {
             const timeTaken = Math.floor((Date.now() - startTimeRef.current) / 1000);
@@ -48,7 +48,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    player_name: UserName,
+                    player_name: userName,
                     time_taken: timeTaken,
                     blocks: (size * size),
                 }),
@@ -57,7 +57,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
             .then(data => console.log('Score API response:', data))
             .catch(err => console.error('API Error:', err));
         }
-    };
+    }, [onGameClear, userName]);
 
     const currentCellSize = initialCellSize;
     const handleClick = (r: number, c: number) => {

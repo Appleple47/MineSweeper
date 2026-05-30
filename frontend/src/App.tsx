@@ -3,7 +3,6 @@ import './App.css';
 import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
 import { numberOfMine, size, BoardComponent } from './components/Board';
-export let UserName = '';
 
 
 function App() {
@@ -18,7 +17,6 @@ function App() {
 
   const startGame = () => {
     if (username.trim() !== '') {
-      UserName = username;
       setStart(Date.now());
       setElapsedTime(0);
       setGameStarted(true);
@@ -124,6 +122,7 @@ function App() {
           flaggingMode={false}
           onGameOver={() => setIsGameOver(true)}
           onGameClear={() => setIsGameOver(true)}
+          userName={username}
         />
         <button
           onClick={restartGame}
@@ -167,6 +166,7 @@ function App() {
         flaggingMode={flaggingMode}
         onGameOver={() => setIsGameOver(true)}
         onGameClear={() => setIsGameOver(true)}
+        userName={username}
       />
       <div style={{
           display: "flex",
