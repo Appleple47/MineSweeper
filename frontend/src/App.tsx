@@ -4,7 +4,7 @@ import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
 import { numberOfMine, size, BoardComponent, resetBoardState } from './components/Board';
 import { resetCellState } from "./components/Cell";
-export let UserName = ' ';
+export let UserName = '';
 
 
 function App() {

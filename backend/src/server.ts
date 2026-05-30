@@ -6,7 +6,7 @@ dotenv.config();
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
 });
-pool.connect()
+pool.connect().catch(err => console.error('DB connection error:', err));
 
 const app = express();
 const corsOptions = {
