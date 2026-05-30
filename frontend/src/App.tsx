@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
@@ -25,6 +25,9 @@ function App() {
       alert('名前を入力してください。\nInput your username.');
     }
   };
+
+  const handleGameOver = useCallback(() => setIsGameOver(true), []);
+  const handleGameClear = useCallback(() => setIsGameOver(true), []);
 
   const restartGame = () => {
     setBoard(generateBoard(size, size, numberOfMine));
@@ -120,8 +123,8 @@ function App() {
           board={board}
           setBoard={setBoard}
           flaggingMode={false}
-          onGameOver={() => setIsGameOver(true)}
-          onGameClear={() => setIsGameOver(true)}
+          onGameOver={handleGameOver}
+          onGameClear={handleGameClear}
           userName={username}
         />
         <button
