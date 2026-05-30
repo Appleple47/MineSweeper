@@ -15,17 +15,9 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
-        "@nuxt/typescript-runtime": "latest",
-        "@nuxtjs/axios": "latest",
-        "body-parser": "latest",
         "cors": "^2.8.5",
+        "dotenv": "latest",
         "express": "latest",
-        "multer": "latest",
-        "nuxt": "latest",
-        "pg": "latest",
-        "pg-hstore": "latest",
-        "sequelize": "latest",
-        "typescript": "latest",
-        "uuid": "latest"
+        "pg": "latest"
     }
 }
