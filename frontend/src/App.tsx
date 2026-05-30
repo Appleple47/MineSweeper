@@ -1,10 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import { generateBoard } from './utils/board';
 import type { Board } from './types/types';
-import { numberOfMine, size, BoardComponent, resetBoardState } from './components/Board';
-import { resetCellState } from "./components/Cell";
-export let UserName = '';
+import { numberOfMine, size, BoardComponent } from './components/Board';
 
 
 function App() {
@@ -19,7 +17,6 @@ function App() {
 
   const startGame = () => {
     if (username.trim() !== '') {
-      UserName = username;
       setStart(Date.now());
       setElapsedTime(0);
       setGameStarted(true);
@@ -29,9 +26,10 @@ function App() {
     }
   };
 
+  const handleGameOver = useCallback(() => setIsGameOver(true), []);
+  const handleGameClear = useCallback(() => setIsGameOver(true), []);
+
   const restartGame = () => {
-    resetCellState();
-    resetBoardState();
     setBoard(generateBoard(size, size, numberOfMine));
     setStart(Date.now());
     setElapsedTime(0);
@@ -125,8 +123,9 @@ function App() {
           board={board}
           setBoard={setBoard}
           flaggingMode={false}
-          onGameOver={() => setIsGameOver(true)}
-          onGameClear={() => setIsGameOver(true)}
+          onGameOver={handleGameOver}
+          onGameClear={handleGameClear}
+          userName={username}
         />
         <button
           onClick={restartGame}
@@ -168,8 +167,9 @@ function App() {
         board={board}
         setBoard={setBoard}
         flaggingMode={flaggingMode}
-        onGameOver={() => setIsGameOver(true)}
-        onGameClear={() => setIsGameOver(true)}
+        onGameOver={handleGameOver}
+        onGameClear={handleGameClear}
+        userName={username}
       />
       <div style={{
           display: "flex",

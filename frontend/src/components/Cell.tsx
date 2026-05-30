@@ -1,27 +1,18 @@
 import React from "react";
-import { UserName } from "../App";
 import type { Board, Cell as CellType} from "../types/types";
-import { size, numberOfMine, chainedblock} from "./Board";
 import { posOfmine } from "../utils/board";
-export let openedblock = 0;
-const API_BASE_URL = "https://1r2mypgiag.execute-api.ap-southeast-2.amazonaws.com/prod";
-
 
 type Props = {
     cell: CellType;
     cellSize: number;
     onClick: (newBoard?: Board) => void;
     board: Board;
-    startTime: number;
-    onGameClear: () => void;
+    hasClickedOnce: boolean;
+    onManualOpen: () => void;
     onGameOver: () => void;
     isGameActive: boolean;
     flaggingMode: boolean;
 };
-
-export function resetCellState() {
-    openedblock = 0;
-}
 
 const getCellText = (cell: CellType): string => {
     let display = "";
@@ -38,7 +29,8 @@ const getCellText = (cell: CellType): string => {
     }
     return display;
 };
-export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTime, onGameClear, onGameOver, isGameActive, flaggingMode}) => {
+
+export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, hasClickedOnce, onManualOpen, onGameOver, isGameActive, flaggingMode}) => {
     const handleClick = () => {
         if(!isGameActive) return;
         if(flaggingMode){
@@ -49,7 +41,7 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTim
         }
         if(cell.isOpen) return;
         if(cell.isflagged) return;
-        if(cell.isMine){
+        if(cell.isMine && hasClickedOnce){
             const newBoard = board.map((row) => row.map((c) => ({ ...c })));
             newBoard[cell.row][cell.col].openedMine = true;
             for(const mine of posOfmine){
@@ -62,26 +54,7 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, startTim
         }
         onClick();
         if(!cell.isOpen){
-            openedblock++;
-            if(!(chainedblock + openedblock + numberOfMine < size * size)){
-                const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-                onGameClear();
-                alert("🎊 Game Clear!\n in "+ timeTaken+" seconds!");
-                fetch(`${API_BASE_URL}/scores`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        player_name: UserName,
-                        time_taken: timeTaken,
-                        blocks: (size * size),
-                    }),
-                })
-                .then(res => res.json())
-                .then(data => console.log('Score API response:', data))
-                .catch(err => console.error('API Error:', err));
-            }
+            onManualOpen();
         }
     }
     return (
