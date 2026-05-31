@@ -1,4 +1,5 @@
-const { Pool } = require("pg");
+import { Pool } from "pg";
+
 const pool = new Pool({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
@@ -7,7 +8,8 @@ const pool = new Pool({
     port: parseInt(process.env.DB_PORT || '5432'),
     ssl: { rejectUnauthorized: false }
 });
-async function initializeTable() {
+
+async function initializeTable(): Promise<void> {
     try {
         await pool.query(`
             CREATE TABLE IF NOT EXISTS scores (
@@ -18,46 +20,46 @@ async function initializeTable() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
-        console.log('Table initialized');
     } catch (error) {
         console.error('Table initialization error:', error);
     }
 }
 
-exports.handler = async (event) => {
-        // console.log('Full event:', JSON.stringify(event, null, 2));
-        // console.log('httpMethod:', event.httpMethod);
-        // console.log('path:', event.path);
-        // console.log('body:', event.body);
-        
-        await initializeTable();
-        
-        const headers = {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            'Access-Control-Allow-Methods': 'GET,POST,OPTIONS', 
-            'Content-Type': 'application/json'
-        };
-        
-        const method = event.httpMethod ? event.httpMethod.toUpperCase() : null;
+const tableInitPromise = initializeTable();
+
+interface LambdaEvent {
+    httpMethod: string;
+    body: string;
+}
+
+interface LambdaResponse {
+    statusCode: number;
+    headers: Record<string, string>;
+    body: string;
+}
+
+const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Content-Type': 'application/json'
+};
+
+export const handler = async (event: LambdaEvent): Promise<LambdaResponse> => {
+    await tableInitPromise;
+
+    const method = event.httpMethod?.toUpperCase() ?? null;
+
     if (method === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers,
-            body: ''
-        };
+        return { statusCode: 200, headers, body: '' };
     }
+
     if (method === 'GET') {
         try {
             const result = await pool.query(
                 `SELECT player_name, time_taken, blocks, created_at FROM scores ORDER BY time_taken ASC LIMIT 10;`
             );
-
-            return {
-                statusCode: 200,
-                headers,
-                body: JSON.stringify(result.rows)
-            };
+            return { statusCode: 200, headers, body: JSON.stringify(result.rows) };
         } catch (error) {
             console.error('DB Select Error:', error);
             return {
@@ -67,11 +69,12 @@ exports.handler = async (event) => {
             };
         }
     }
-    if (event.httpMethod === 'POST') {
+
+    if (method === 'POST') {
         try {
             const body = JSON.parse(event.body);
             const { player_name, time_taken, blocks } = body;
-    
+
             if (typeof time_taken !== 'number' || !player_name) {
                 return {
                     statusCode: 400,
@@ -79,12 +82,12 @@ exports.handler = async (event) => {
                     body: JSON.stringify({ message: 'Invalid data' })
                 };
             }
-    
+
             await pool.query(
                 `INSERT INTO scores(player_name, time_taken, blocks) VALUES($1, $2, $3);`,
                 [player_name, time_taken, blocks]
             );
-    
+
             return {
                 statusCode: 201,
                 headers,
@@ -99,10 +102,10 @@ exports.handler = async (event) => {
             };
         }
     }
+
     return {
         statusCode: 404,
         headers,
-        body: JSON.stringify({ message: "DEBUG: Final Fallback 404." }) // メッセージを再変更
+        body: JSON.stringify({ message: 'Not Found' })
     };
 };
-
