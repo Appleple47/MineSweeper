@@ -10,26 +10,25 @@ const pool = new Pool({
 });
 
 async function initializeTable(): Promise<void> {
-    try {
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS scores (
-                id SERIAL PRIMARY KEY,
-                player_name VARCHAR(100) NOT NULL,
-                time_taken INTEGER NOT NULL,
-                blocks INTEGER NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `);
-    } catch (error) {
-        console.error('Table initialization error:', error);
-    }
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS scores (
+            id SERIAL PRIMARY KEY,
+            player_name VARCHAR(100) NOT NULL,
+            time_taken INTEGER NOT NULL,
+            blocks INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    `);
 }
 
-const tableInitPromise = initializeTable();
+const tableInitPromise = initializeTable().catch(error => {
+    console.error('Table initialization error:', error);
+    process.exit(1);
+});
 
 interface LambdaEvent {
     httpMethod: string;
-    body: string;
+    body: string | null;
 }
 
 interface LambdaResponse {
@@ -72,7 +71,7 @@ export const handler = async (event: LambdaEvent): Promise<LambdaResponse> => {
 
     if (method === 'POST') {
         try {
-            const body = JSON.parse(event.body);
+            const body = JSON.parse(event.body ?? '');
             const { player_name, time_taken, blocks } = body;
 
             if (typeof time_taken !== 'number' || !player_name) {

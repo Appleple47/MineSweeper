@@ -7,6 +7,19 @@ const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
 });
 
+pool.query(`
+    CREATE TABLE IF NOT EXISTS scores (
+        id SERIAL PRIMARY KEY,
+        player_name VARCHAR(100) NOT NULL,
+        time_taken INTEGER NOT NULL,
+        blocks INTEGER NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+`).catch(error => {
+    console.error('Table initialization error:', error);
+    process.exit(1);
+});
+
 const app = express();
 const corsOptions = {
     origin: process.env.CORS_URL,
