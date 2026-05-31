@@ -71,7 +71,10 @@ export const handler = async (event: LambdaEvent): Promise<LambdaResponse> => {
 
     if (method === 'POST') {
         try {
-            const body = JSON.parse(event.body ?? '');
+            if (!event.body) {
+                return { statusCode: 400, headers, body: JSON.stringify({ message: 'Invalid data' }) };
+            }
+            const body = JSON.parse(event.body);
             const { player_name, time_taken, blocks } = body;
 
             if (typeof time_taken !== 'number' || !player_name) {
