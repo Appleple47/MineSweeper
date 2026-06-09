@@ -91,7 +91,6 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
             alignContent: "center",
             gridTemplateColumns: `repeat(${size}, ${cellSize}px)`,
             gridTemplateRows: `repeat(${size}, ${cellSize}px)`,
-
             border: "1px solid black",
             width: `${cellSize * size}px`,
             borderRadius: "8px",
