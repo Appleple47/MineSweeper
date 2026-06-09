@@ -63,7 +63,6 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
         }
     }, [onGameClear, userName]);
 
-
     const handleClick = (r: number, c: number) => {
         if (!isGameActive) return;
         if (!hasClickedOnce) {
@@ -93,10 +92,8 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
             gridTemplateColumns: `repeat(${size}, ${cellSize}px)`,
             gridTemplateRows: `repeat(${size}, ${cellSize}px)`,
 
-            gap: "1px",
-            background: "black",
             border: "1px solid black",
-            width: `${cellSize * size + (size - 1)}px`,
+            width: `${cellSize * size}px`,
             borderRadius: "8px",
         }}>
             {board.map((row, r) =>
