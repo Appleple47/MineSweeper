@@ -54,7 +54,6 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
                 }),
             })
             .then(res => res.json())
-            .then(data => console.log('Score API response:', data))
             .catch(err => console.error('API Error:', err));
         }
     }, [onGameClear, userName]);
