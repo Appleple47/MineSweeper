@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { Board } from "../types/types";
 import { generateBoard } from "../utils/board";
 import { Cell } from "./Cell";
@@ -23,14 +23,19 @@ const calculateCellSize = () => {
     return Math.floor((containerSize - safePadding) / size);
 };
 
-const initialCellSize = calculateCellSize();
-
 export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode, onGameOver, onGameClear, userName }) => {
     const [isGameActive, setIsGameActive] = useState(true);
     const [hasClickedOnce, setHasClickedOnce] = useState(false);
+    const [cellSize, setCellSize] = useState(calculateCellSize);
     const startTimeRef = useRef<number>(0);
     const chainedblockRef = useRef(0);
     const openedblockRef = useRef(0);
+
+    useEffect(() => {
+        const handleResize = () => setCellSize(calculateCellSize());
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const handleGameOver = () => {
         setIsGameActive(false);
@@ -58,7 +63,6 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
         }
     }, [onGameClear, userName]);
 
-    const currentCellSize = initialCellSize;
     const handleClick = (r: number, c: number) => {
         if (!isGameActive) return;
         if (!hasClickedOnce) {
@@ -85,9 +89,10 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
             display: "grid",
             justifyContent: "center",
             alignContent: "center",
-            gridTemplateColumns: `repeat(${size}, ${currentCellSize+5}px)`,
-            paddingBottom: "50px",
-            width: `${(currentCellSize + 5) * size}px`,
+            gridTemplateColumns: `repeat(${size}, ${cellSize}px)`,
+            gridTemplateRows: `repeat(${size}, ${cellSize}px)`,
+            border: "1px solid black",
+            width: `${cellSize * size}px`,
             borderRadius: "8px",
         }}>
             {board.map((row, r) =>
@@ -95,7 +100,7 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
                     <Cell
                         key={`${r}-${c}`}
                         cell={cell}
-                        cellSize={currentCellSize}
+                        cellSize={cellSize}
                         board={board}
                         hasClickedOnce={hasClickedOnce}
                         onClick={(newBoard) => {
