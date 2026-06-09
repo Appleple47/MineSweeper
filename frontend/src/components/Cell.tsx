@@ -63,7 +63,9 @@ export const Cell: React.FC<Props> = ({ cell, cellSize, onClick, board, hasClick
             style={{
                 width: cellSize,
                 height: cellSize,
-                border: "1px solid #666",
+                padding: 0,
+                margin: 0,
+                border: "1px solid black",
                 background: cell.isOpen ? "#ddd" : "#999",
                 fontSize: `${cellSize * 0.5}px`,
                 justifyContent: "center",

@@ -85,9 +85,13 @@ export const BoardComponent: React.FC<Props> = ({ board, setBoard, flaggingMode,
             display: "grid",
             justifyContent: "center",
             alignContent: "center",
-            gridTemplateColumns: `repeat(${size}, ${currentCellSize+5}px)`,
-            paddingBottom: "50px",
-            width: `${(currentCellSize + 5) * size}px`,
+            gridTemplateColumns: `repeat(${size}, ${currentCellSize}px)`,
+            gridTemplateRows: `repeat(${size}, ${currentCellSize}px)`,
+
+            gap: "1px",
+            background: "black",
+            border: "1px solid black",
+            width: `${currentCellSize * size + (size - 1)}px`,
             borderRadius: "8px",
         }}>
             {board.map((row, r) =>
